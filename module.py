@@ -51,3 +51,8 @@ def get_post_whole_text(api_key, post_id):
                     continue
             continue
     return post_string
+
+def get_popular_reddit_posts_with_whole_text(api_key):
+    popular_posts = get_popular_reddit_posts(api_key)
+    popular_posts['postText'] = popular_posts['id'].apply(get_post_whole_text,args=api_key)
+    return popular_posts
