@@ -1,7 +1,10 @@
-from module import get_popular_reddit_posts_with_whole_text
+from module import get_popular_reddit_posts, get_ds_reddit_posts
 from config import api_key
 
+popular_posts_df = get_popular_reddit_posts(api_key=api_key.RAPID_API_KEY)
+ds_posts_df =get_ds_reddit_posts(api_key=api_key.RAPID_API_KEY)
 
-data=get_popular_reddit_posts_with_whole_text(api_key.RAPID_API_KEY)
-print(data.head())
-data.to_csv("popular_reddit_posts_with_whole_text.csv",index=False)
+
+print(f"Popular reddit posts:\n{popular_posts_df.head()}")
+print(f"Data-science reddit posts with whole text:\n{ds_posts_df.head()}")
+
