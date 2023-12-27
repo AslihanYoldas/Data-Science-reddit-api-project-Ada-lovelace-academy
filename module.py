@@ -3,6 +3,8 @@ from config import constants
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+import nlp_rake
+from wordcloud import WordCloud
 
 def make_api_call(api_key, api_host, querystring, url):
  
@@ -125,3 +127,26 @@ def corr_heatmap(df, column_names):
             xticklabels=matrix.columns.values,
             yticklabels=matrix.columns.values)
 
+def extract_words(text):
+    extractor = nlp_rake.Rake(max_words=3,min_freq=3,min_chars=4)
+    res = extractor.apply(text)
+    return res
+
+def plot_frequent_words(text):
+    res = extract_words(text)
+    pair_list = res[:20]
+    k,v = zip(*pair_list)
+    plt.bar(range(len(k)),v)
+    plt.xticks(range(len(k)),k,rotation='vertical')
+    plt.show()
+
+def plot_word_cloud_generate_from_freq(text):
+    res = extract_words(text)
+    wc = WordCloud(background_color='white',width=800,height=600)
+    plt.figure(figsize=(15,7))
+    plt.imshow(wc.generate_from_frequencies({ k:v for k,v in res[:20] }))
+
+def plot_word_cloud_generate_from_text(text):
+    wc = WordCloud(background_color='white',width=800,height=600)
+    plt.imshow(wc.generate(text))
+    
