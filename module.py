@@ -84,7 +84,7 @@ def find_outliers(df,column_name):
         z_score = (data - df[column_name].mean()) / df[column_name].std()
         if abs(z_score) > threshold:
             outliers.append(index)
-    return outliers
+    return df.iloc[outliers]
 
 def plot_outliers(x, y, title, xlabel, ylabel, color='indigo'):
     plt.title(title)
@@ -97,18 +97,18 @@ def plot_outliers(x, y, title, xlabel, ylabel, color='indigo'):
         
     plt.show()
 
-def plot_outliers_with_id(x, y, id, title, xlabel, ylabel, max_value, min_value, color='indigo'):
+def plot_outliers_with_id(df, column_name_x,column_name_y, column_name_id, title, xlabel, ylabel, max_value, min_value, color='indigo'):
     plt.title(title)
     plt.ylabel(ylabel)
     plt.xlabel(xlabel)
     plt.tick_params(axis='both', which='both', labelbottom=False, bottom=False)
-    for i in range(len(x)):
+    for i in range(len(df)):
         try:
-            x = x[i]
-            y = y[i]
+            x = df[column_name_x][i]
+            y = df[column_name_y][i]
             plt.plot(x, y, "o", color=color)
-            if y[i] > max_value or y[i]<min_value :
-                plt.text(x, y * (1 - 0.05), id[i], fontsize=10)
+            if y > max_value or y < min_value :
+                plt.text(x, y * (1 - 0.05), df[column_name_id][i], fontsize=10)
         except:
             continue
     plt.show()
