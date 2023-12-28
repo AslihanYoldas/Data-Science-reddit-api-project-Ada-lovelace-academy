@@ -38,7 +38,7 @@ popular_posts_df = popular_posts_df.drop(popular_posts_df.query('score < 5000').
 #plot_outliers_with_id(popular_posts_df,'id','goldCount', 'id', 'Popular Posts Gold Count', xlabel='Posts', ylabel='Gold Count', min_value=0, max_value=300)
 
 #Printing the outlier row to find out the index
-print(find_outliers(popular_posts_df, 'goldCount').index)
+print(find_outliers(popular_posts_df, 'goldCount'))
 
 # Dropping the outlier and reseting the index
 popular_posts_df = popular_posts_df.drop(find_outliers(popular_posts_df, 'goldCount').index).reset_index(drop=True)
@@ -48,26 +48,56 @@ print(popular_posts_df)
 
 # Plotting  number of comment and score as a scatter plot see their relationship
 plot_scatter(popular_posts_df,
-             'numComments',
-               'score', 
-               'Popular Posts Number of Comments and Score',
-                 'numComments' ,
-                   'score')
+            'numComments',
+            'score', 
+            'Popular Posts Number of Comments and Score',
+            'numComments' ,
+            'score')
 
 # Calculating correlation and showing with heatmap
 corr_heatmap(popular_posts_df,['score', 'numComments', 'goldCount'])
 #Getting basic statistics values of the data without the outliers
 print(popular_posts_df.describe())
 
+## Data science Posts
 
+# Printing first five rows
+print(f"Data-science reddit posts with whole text:\n{ds_posts_df.head()}")
 
+#Printing info for to get more information about data
+print(ds_posts_df.info())
 
+#Filling null post text with their titles
+ds_posts_df['post_text'] = ds_posts_df.post_text.fillna(ds_posts_df.title)
 
+# Detecting Outliiers
 
+# Plotting outliers
+plot_outliers(ds_posts_df['id'], ds_posts_df['score'],'Data Science Posts Score', xlabel='Posts', ylabel='Score')
 
+#Finding and dropping outlier
+ds_posts_df = ds_posts_df.drop(find_outliers(ds_posts_df, 'score').index).reset_index(drop=True)
 
+# Plotting post scores without outliers
+plot_outliers(ds_posts_df['id'], ds_posts_df['score'],'Data Science Posts Score Without Outlier', xlabel='Posts', ylabel='Score')
 
-#print(f"Data-science reddit posts with whole text:\n{ds_posts_df.head()}")
+#Plotting histogram of comment numbers of popular posts
+plot_hist(ds_posts_df,'Data Science Posts Number of Comments', 'Number of Comments', 'numComments', 3, True )
+
+# Ploting score and number of comments
+plot_scatter(ds_posts_df,
+            'numComments',
+            'score', 
+            'Data Science Posts Number of Comments and Score',
+            'numComments' ,
+            'score')
+
+# Calculating correlation and showing with heatmap
+corr_heatmap(ds_posts_df,['score', 'numComments'])
+
+#Getting basic statistics values of the data without the outliers
+print(ds_posts_df.describe())
+
 
 
 
