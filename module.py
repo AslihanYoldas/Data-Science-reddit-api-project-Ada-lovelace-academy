@@ -6,6 +6,7 @@ import seaborn as sns
 import nlp_rake
 from wordcloud import WordCloud
 
+
 def make_api_call(api_key, api_host, querystring, url):
  
     headers = {
@@ -120,7 +121,7 @@ def plot_hist(df, title, xlabel, column_name, bin_num, kde, color='maroon'):
     sns.histplot(data = df, x = column_name, bins = bin_num,  kde = kde, color = color )
     plt.show()
 
-def plot_scatter(df, colmn_name_x, colmn_name_y, id, title, xlabel, ylabel, color='indigo'):
+def plot_scatter(df, colmn_name_x, colmn_name_y, title, xlabel, ylabel, color='indigo'):
     plt.title(title)
     plt.ylabel(ylabel)
     plt.xlabel(xlabel)
@@ -131,31 +132,37 @@ def plot_scatter(df, colmn_name_x, colmn_name_y, id, title, xlabel, ylabel, colo
     plt.show()
 
 def corr_heatmap(df, column_names):
-    matrix = df[[column_names]].corr()
+    matrix = df[column_names].corr()
     sns.heatmap(matrix, 
             xticklabels=matrix.columns.values,
-            yticklabels=matrix.columns.values)
+            yticklabels=matrix.columns.values,
+            vmin=-1)
+    plt.show()
 
 def extract_words(text):
     extractor = nlp_rake.Rake(max_words=3,min_freq=3,min_chars=4)
     res = extractor.apply(text)
     return res
 
-def plot_frequent_words(text):
+def plot_frequent_words(text,title):
     res = extract_words(text)
     pair_list = res[:20]
     k,v = zip(*pair_list)
+    plt.title(title)
     plt.bar(range(len(k)),v)
     plt.xticks(range(len(k)),k,rotation='vertical')
     plt.show()
 
-def plot_word_cloud_generate_from_freq(text):
+def plot_word_cloud_generate_from_freq(text,title):
     res = extract_words(text)
     wc = WordCloud(background_color='white',width=800,height=600)
-    plt.figure(figsize=(15,7))
     plt.imshow(wc.generate_from_frequencies({ k:v for k,v in res[:20] }))
+    plt.title(title)
+    plt.show()
 
-def plot_word_cloud_generate_from_text(text):
+def plot_word_cloud_generate_from_text(text,title):
     wc = WordCloud(background_color='white',width=800,height=600)
     plt.imshow(wc.generate(text))
+    plt.title(title)
+    plt.show()
     
