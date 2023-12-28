@@ -1,14 +1,10 @@
-from module import get_popular_reddit_posts, get_ds_reddit_posts, df_turn_datatype_to_numeric, find_outliers,plot_outliers, plot_outliers_with_id, plot_hist, plot_scatter, corr_heatmap
-
+from module import * 
+import string
 from config import api_key
 
-import pandas as pd
-
 # Getting the data
-#popular_posts_df = get_popular_reddit_posts(api_key=api_key.RAPID_API_KEY)
-#ds_posts_df =get_ds_reddit_posts(api_key=api_key.RAPID_API_KEY)
-popular_posts_df = pd.read_csv("popular_posts.csv")
-ds_posts_df = pd.read_csv("data_science_posts.csv")
+popular_posts_df = get_popular_reddit_posts(api_key=api_key.RAPID_API_KEY)
+ds_posts_df =get_ds_reddit_posts(api_key=api_key.RAPID_API_KEY)
 
 # Popular Reddit Posts Analyze and Viz
 # Printing first five rows
@@ -22,20 +18,20 @@ df_turn_datatype_to_numeric(popular_posts_df, ['score','numComments', 'goldCount
 
 #Detecting Outliers
 # Plotting outliers
-#plot_outliers(popular_posts_df['id'], popular_posts_df['score'],'Popular Posts Score', xlabel='Posts', ylabel='Score')
-#plot_outliers_with_id(popular_posts_df,'id','score', 'id', 'Popular Posts Score', xlabel='Posts', ylabel='Score', min_value=5000, max_value=300000)
+plot_outliers(popular_posts_df['id'], popular_posts_df['score'],'Popular Posts Score', xlabel='Posts', ylabel='Score')
+plot_outliers_with_id(popular_posts_df,'id','score', 'id', 'Popular Posts Score', xlabel='Posts', ylabel='Score', min_value=5000, max_value=300000)
 
 # Dropping outliers from the plot and reseting index after dropping
 popular_posts_df = popular_posts_df.drop(popular_posts_df.query('score < 5000').index).reset_index(drop=True)
 
 #Plotting popular posts score without outliers
-#plot_outliers(popular_posts_df['id'], popular_posts_df['score'],'Popular Posts Score Without Outliers', xlabel='Posts', ylabel='Score')
+plot_outliers(popular_posts_df['id'], popular_posts_df['score'],'Popular Posts Score Without Outliers', xlabel='Posts', ylabel='Score')
 
 #Plotting histogram of comment numbers of popular posts
-#plot_hist(popular_posts_df,'Popular Posts Number of Comments', 'Number of Comments', 'numComments', 5, True )
+plot_hist(popular_posts_df,'Popular Posts Number of Comments', 'Number of Comments', 'numComments', 5, True )
 
 # Plotting gold count outliers
-#plot_outliers_with_id(popular_posts_df,'id','goldCount', 'id', 'Popular Posts Gold Count', xlabel='Posts', ylabel='Gold Count', min_value=0, max_value=300)
+plot_outliers_with_id(popular_posts_df,'id','goldCount', 'id', 'Popular Posts Gold Count', xlabel='Posts', ylabel='Gold Count', min_value=0, max_value=300)
 
 #Printing the outlier row to find out the index
 print(find_outliers(popular_posts_df, 'goldCount'))
@@ -44,7 +40,7 @@ print(find_outliers(popular_posts_df, 'goldCount'))
 popular_posts_df = popular_posts_df.drop(find_outliers(popular_posts_df, 'goldCount').index).reset_index(drop=True)
 print(popular_posts_df)
 # Plotting gold count without outlier
-#plot_outliers_with_id(popular_posts_df,'id','goldCount', 'id', 'Popular Posts Gold Count Without Outlier', xlabel='Posts', ylabel='Gold Count', min_value=0, max_value=300)
+plot_outliers_with_id(popular_posts_df,'id','goldCount', 'id', 'Popular Posts Gold Count Without Outlier', xlabel='Posts', ylabel='Gold Count', min_value=0, max_value=300)
 
 # Plotting  number of comment and score as a scatter plot see their relationship
 plot_scatter(popular_posts_df,
@@ -98,6 +94,43 @@ corr_heatmap(ds_posts_df,['score', 'numComments'])
 #Getting basic statistics values of the data without the outliers
 print(ds_posts_df.describe())
 
+#Data Science Post Text Analyzing
 
+# Post texts and titles turn into lis
+ds_post_text_list =ds_posts_df['post_text'].to_list()
+ds_post_title_list=ds_posts_df['title'].to_list()
 
+# We  filled none text value with title because of that we are removing the titles in the post text
+for i in range (len(ds_post_text_list)):
+    if (ds_post_text_list[i] == ds_post_title_list[i]):
+        ds_post_text_list[i] = ""
 
+# Joining list to get a string
+data_science_posts_titles  = " ".join(ds_post_title_list)
+data_science_posts_text = " ".join(ds_post_text_list)
+
+# Cleaning punctuation
+exclude = set(string.punctuation)
+data_science_posts_text = ''.join(ch for ch in data_science_posts_text if ch not in exclude)
+data_science_posts_titles = ''.join(ch for ch in data_science_posts_titles if ch not in exclude)
+
+# Plotting frequent words in the post texts
+plot_frequent_words(data_science_posts_text, 'Post text word frequencies')
+
+# Showing frequent words in the word cloud
+plot_word_cloud_generate_from_freq(data_science_posts_text, 'Data Science Post Texts  Word Cloud Generated From Frequinces')
+
+# Generating word cloud with post texts
+plot_word_cloud_generate_from_text(data_science_posts_text , 'Data Science Post Texts  Word Cloud Generated From Text')
+
+# Getting titles and post texts in a str
+ds_texts = data_science_posts_titles+  data_science_posts_text 
+
+# Getting frequent words in post texts and titles
+plot_frequent_words(ds_texts, 'Post text and titles word frequencies')
+
+# Showing frequent words in the word cloud
+plot_word_cloud_generate_from_freq(ds_texts, 'Data Science Post Texts and Titles Word Cloud Generated From Frequinces')
+
+# Generating word cloud with post texts and post titles
+plot_word_cloud_generate_from_text(ds_texts, 'Data Science Post Texts and Titles Word Cloud Generated From Text')
