@@ -77,6 +77,15 @@ def df_turn_datatype_to_numeric(df,column_names):
         df[column_name] = pd.to_numeric(df[column_name])
     return df 
 
+def find_outliers(df,column_name):
+    threshold = 3
+    outliers = []
+    for index, data in enumerate(df[column_name]):
+        z_score = (data - df[column_name].mean()) / df[column_name].std()
+        if abs(z_score) > threshold:
+            outliers.append(index)
+    return outliers
+
 def plot_outliers(x, y, title, xlabel, ylabel, color='indigo'):
     plt.title(title)
     plt.ylabel(ylabel)
