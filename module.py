@@ -6,9 +6,17 @@ import seaborn as sns
 import nlp_rake
 from wordcloud import WordCloud
 
-
 def make_api_call(api_key, api_host, querystring, url):
- 
+    """
+    Make a API call to Rapid Api with given api key and api host. Returns the API response.
+
+    :param api_key: str -unique key given from rapid api for authorization
+    :param api_host: str -api service url that provides data (for reddit api:reddit34.p.rapidapi.com)
+    :querystring : dict -required or optional parameters that API wants for the data
+    :url: str -url adress for the api call with the endpoint 
+    :return:dict -API response
+    
+    """ 
     headers = {
         "X-RapidAPI-Key": api_key,
         "X-RapidAPI-Host": api_host
@@ -17,6 +25,15 @@ def make_api_call(api_key, api_host, querystring, url):
     return response.json()
 
 def get_popular_reddit_posts(api_key):
+    """
+    Make a API call to Reddit Api Popular Posts endpoint via Rapid Api with given api key. 
+    Returns the popular posts as a dataframe
+
+    :param api_key: str -unique key given from rapid api for authorization
+  
+    :return popular_posts_df:dataframe -Returns some data from popular posts as a dataframe
+    
+    """ 
     querystring = {"time":"year"}# required parameter
     data_popular = make_api_call(api_key, constants.RAPID_API_HOST, querystring, constants.BASE_URL+constants.POPULAR_POST_ENDPOINT)
     popular_posts =[]
@@ -36,6 +53,14 @@ def get_popular_reddit_posts(api_key):
     return popular_posts_df
 
 def get_post_text(post_text):
+    """
+    Turns structured post text data to a string.
+
+    :param post_text: dict -structured post text data in the API response
+  
+    :return post_string:string -Returns the post text data as string
+    
+    """ 
     post_string=""
     if (len(post_text) == 0):
         return "None"
@@ -52,6 +77,15 @@ def get_post_text(post_text):
     return post_string
 
 def get_ds_reddit_posts(api_key):
+    """
+    Make a API call to Reddit Api Subreddit Posts endpoint via Rapid Api with given api key. 
+    Returns the that subreddit's posts as a dataframe
+
+    :param api_key: str -unique key given from rapid api for authorization
+  
+    :return ds_posts_df:dataframe -Returns the that subreddit's posts as a dataframe
+    
+    """ 
     querystring = {"subreddit":"datascience","sort":"new"}
     data_science_posts = make_api_call(api_key, constants.RAPID_API_HOST, querystring, constants.BASE_URL+constants.SUBREDDIT_POSTS_ENDPOINT)
     ds_posts =[]
@@ -74,11 +108,29 @@ def get_ds_reddit_posts(api_key):
     return ds_posts_df
 
 def df_turn_datatype_to_numeric(df,column_names):
+    """
+    In a dataframe turns the given columns' data types to numeric.
+
+    :param df: dataframe 
+    :param column_names: list- column names 
+  
+    :return df:dataframe -Returns the dataframe after changing data types to numerical for given column names
+    """
     for column_name in column_names:
         df[column_name] = pd.to_numeric(df[column_name])
     return df 
 
 def find_outliers(df,column_name):
+    """
+    Find outliers for given dataframe's column via z-score
+
+    :param df: dataframe 
+    :param column_name: list  
+  
+    :return :dataframe -Returns the outliers data as dataframe
+    
+    """ 
+    
     threshold = 3
     outliers = []
     for index, data in enumerate(df[column_name]):
@@ -88,6 +140,19 @@ def find_outliers(df,column_name):
     return df.iloc[outliers]
 
 def plot_outliers(x, y, title, xlabel, ylabel, color='indigo'):
+    """
+    Plot x and y data as a point. That way we can detect outliers.
+
+    :param x: series - x axis data
+    :param y: series - y axis data
+    :param title: str - Title of the plot
+    :param xlabel: str - Label of the x-axis
+    :param ylabel: str - Label of the y-axis
+    :param color: str - Color of the plot
+
+    :return : shows the plot
+    
+    """ 
     plt.title(title)
     plt.ylabel(ylabel)
     plt.xlabel(xlabel)
@@ -99,6 +164,22 @@ def plot_outliers(x, y, title, xlabel, ylabel, color='indigo'):
     plt.show()
 
 def plot_outliers_with_id(df, column_name_x,column_name_y, column_name_id, title, xlabel, ylabel, max_value, min_value, color='indigo'):
+    """
+    Plots dataframe's columns as a point. For given min and max values detect outliers and show the id of that outliers.
+
+    :param df: dataframe
+    :param column_name_x: str - x axis data's column name
+    :param column_name_y: str - y axis data's column name
+    :param column_name_id: str - id data column name
+    :param title: str - Title of the plot
+    :param xlabel: str - Label of the x-axis
+    :param ylabel: str - Label of the y-axis
+    :param max_value: int - max value for the data
+    :param min_value: int - min value for the data
+    :param color: str - Color of the plot
+
+    :return : shows the plot"""
+    
     plt.title(title)
     plt.ylabel(ylabel)
     plt.xlabel(xlabel)
@@ -115,13 +196,36 @@ def plot_outliers_with_id(df, column_name_x,column_name_y, column_name_id, title
     plt.show()
 
 def plot_hist(df, title, xlabel, column_name, bin_num, kde, color='maroon'):
+    """
+    Plots histogram for the given dataframe's column.
+
+    :param df: dataframe
+    :param title: str - Title of the plot
+    :param xlabel: str - Label of the x-axis
+    :param column_name: str - x axis data's column name
+    :param bin-num: int - Number of the bins
+    :param kde: bool - Drawing the line 
+
+    :return : shows the plot"""
     plt.title(title)
     plt.ylabel('Count')
     plt.xlabel(xlabel)
     sns.histplot(data = df, x = column_name, bins = bin_num,  kde = kde, color = color )
     plt.show()
 
-def plot_scatter(df, colmn_name_x, colmn_name_y, title, xlabel, ylabel, color='indigo'):
+def plot_scatter(df, colmn_name_x, colmn_name_y, title, xlabel, ylabel):
+    """
+    Scatter plot for the given dataframe's columns.
+
+    :param df: dataframe
+    :param column_name_x: str - x axis data's column name
+    :param column_name_y: str - y axis data's column name
+    :param title: str - Title of the plot
+    :param xlabel: str - Label of the x-axis
+    :param ylabel: str - Label of the y-axis
+
+    :return : shows the plot
+    """
     plt.title(title)
     plt.ylabel(ylabel)
     plt.xlabel(xlabel)
@@ -132,6 +236,15 @@ def plot_scatter(df, colmn_name_x, colmn_name_y, title, xlabel, ylabel, color='i
     plt.show()
 
 def corr_heatmap(df, column_names):
+    """
+    Calculates correllation between given dataframe's columns and shows it as a heatmap
+
+    :param df: dataframe 
+    :param column_names: list -column names 
+  
+    :return :shows the plot
+    """
+    
     matrix = df[column_names].corr()
     sns.heatmap(matrix, 
             xticklabels=matrix.columns.values,
@@ -140,11 +253,26 @@ def corr_heatmap(df, column_names):
     plt.show()
 
 def extract_words(text):
+    """
+    Extracts most frequent words from the text
+
+    :param text: str
+    :return res : list - most frequent words and their frequency as tuples
+    """
+
     extractor = nlp_rake.Rake(max_words=3,min_freq=3,min_chars=4)
     res = extractor.apply(text)
     return res
 
 def plot_frequent_words(text,title):
+    """
+    Extracts most frequent words from the text and show in a plot.
+
+    :param text: string
+    :param title: str - Title of the plot
+
+    :return : shows plot
+    """
     res = extract_words(text)
     pair_list = res[:20]
     k,v = zip(*pair_list)
@@ -154,6 +282,14 @@ def plot_frequent_words(text,title):
     plt.show()
 
 def plot_word_cloud_generate_from_freq(text,title):
+    """
+    Extracts most frequent words from the text and generate word cloud from frequent words.
+
+    :param text: str
+    :param title: str - Title of the plot
+
+    :return : shows word cloud
+    """
     res = extract_words(text)
     wc = WordCloud(background_color='white',width=800,height=600)
     plt.imshow(wc.generate_from_frequencies({ k:v for k,v in res[:20] }))
@@ -161,6 +297,14 @@ def plot_word_cloud_generate_from_freq(text,title):
     plt.show()
 
 def plot_word_cloud_generate_from_text(text,title):
+    """
+    Generate word cloud from a text and show it.
+
+    :param text: str
+    :param title: str - Title of the plot
+
+    :return : shows word cloud
+    """
     wc = WordCloud(background_color='white',width=800,height=600)
     plt.imshow(wc.generate(text))
     plt.title(title)
